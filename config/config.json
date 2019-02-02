@@ -1,10 +1,12 @@
 {
   "development": {
-    "username": "root",
-    "password": null,
-    "database": "exampledb",
+    "username": "homestead",
+    "password": "secret",
+    "database": "authDemo",
     "host": "localhost",
-    "dialect": "mysql"
+    "dialect": "mysql",
+    "port": 33060,
+    "operatorsAliases": false
   },
   "test": {
     "username": "root",
