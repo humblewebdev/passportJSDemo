@@ -9,7 +9,6 @@ var models = require("./models");
 
 var app = express();
 var PORT = process.env.PORT || 3000;
-var bodyParser = require('body-parser');
 
 var passport = require('passport');
 var LocalStrategy = require('passport-local');
@@ -36,33 +35,38 @@ passport.use(new LocalStrategy(
   function(username, password, cb) {
     models.User.findOne({ username: username }).then(
         function(user) {
+          console.log(user);
           if (!user) { 
             return cb(null, false, {message: 'Incorrect email or password.'});
+          } else if (user.validatePassword(password)) {
+            return cb(null, user, {message: 'Logged In Successfully'});
+          } else {
+            return cb(null, false, {message: 'Incorrect Password!'});
           }
-          return cb(null, user, {message: 'Logged In Successfully'});
         }
       ).catch(error => {
         cb(error)
+        throw error;
       });
     }
   ));
 
-  passport.use(new JWTStrategy({
-    jwtFromRequest: ExtractJWT.fromAuthHeaderAsBearerToken(),
-    secretOrKey   : 'your_jwt_secret'
-    },
-    function (jwtPayload, cb) {
+//   passport.use(new JWTStrategy({
+//     jwtFromRequest: ExtractJWT.fromAuthHeaderAsBearerToken(),
+//     secretOrKey   : 'your_jwt_secret'
+//     },
+//     function (jwtPayload, cb) {
 
-    //find the user in db if needed
-    return models.User.findById(jwtPayload.id)
-        .then(user => {
-            return cb(null, user);
-        })
-        .catch(err => {
-            return cb(err);
-        });
-    }
-));
+//     //find the user in db if needed
+//     return models.User.findById(jwtPayload.id)
+//         .then(user => {
+//             return cb(null, user);
+//         })
+//         .catch(err => {
+//             return cb(err);
+//         });
+//     }
+// ));
 
 // Handlebars
 app.engine(
