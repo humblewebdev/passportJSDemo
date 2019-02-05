@@ -12,6 +12,7 @@ var PORT = process.env.PORT || 3000;
 
 var passport = require('passport');
 var LocalStrategy = require('passport-local');
+// var JWTStrategy = require('passport-jwt');
 
 
 // Middleware
@@ -51,22 +52,22 @@ passport.use(new LocalStrategy(
     }
   ));
 
-//   passport.use(new JWTStrategy({
-//     jwtFromRequest: ExtractJWT.fromAuthHeaderAsBearerToken(),
-//     secretOrKey   : 'your_jwt_secret'
-//     },
-//     function (jwtPayload, cb) {
+  // passport.use(new JWTStrategy({
+  //     jwtFromRequest: ExtractJWT.fromAuthHeaderAsBearerToken(),
+  //     secretOrKey   : 'your_jwt_secret'
+  //     },
+  //     function (jwtPayload, cb) {
 
-//     //find the user in db if needed
-//     return models.User.findById(jwtPayload.id)
-//         .then(user => {
-//             return cb(null, user);
-//         })
-//         .catch(err => {
-//             return cb(err);
-//         });
-//     }
-// ));
+  //     //find the user in db if needed
+  //     return models.User.findById(jwtPayload.id)
+  //         .then(user => {
+  //             return cb(null, user);
+  //         })
+  //         .catch(err => {
+  //             return cb(err);
+  //         });
+  //     }
+  // ));
 
 // Handlebars
 app.engine(
