@@ -2,7 +2,7 @@
 var models = require('../models');
 
 module.exports = {
-  up: (queryInterface, Sequelize) => {
+  up: function()  {
     /*
       Add altering commands here.
       Return a promise to correctly handle asynchronicity.
@@ -22,12 +22,12 @@ module.exports = {
         createdAt: new Date(),
         updatedAt: new Date()
       };
-      return models.User.create(fields).then(() => {
+      return models.User.create(fields).then(function() {
         console.log('user created');
       });
   },
 
-  down: (queryInterface, Sequelize) => {
+  down: function(queryInterface) {
     /*
       Add reverting commands here.
       Return a promise to correctly handle asynchronicity.

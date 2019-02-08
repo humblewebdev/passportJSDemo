@@ -1,24 +1,25 @@
 var db = require("../models");
+var router = require('express').Router();
 
-module.exports = function(app) {
   // Get all examples
-  app.get("/api/examples", function(req, res) {
+  router.get("/examples", function(req, res, next) {
     db.Example.findAll({}).then(function(dbExamples) {
       res.json(dbExamples);
     });
   });
 
   // Create a new example
-  app.post("/api/examples", function(req, res) {
+  router.post("/examples", function(req, res, next) {
     db.Example.create(req.body).then(function(dbExample) {
       res.json(dbExample);
     });
   });
 
   // Delete an example by id
-  app.delete("/api/examples/:id", function(req, res) {
+  router.delete("/examples/:id", function(req, res, next) {
     db.Example.destroy({ where: { id: req.params.id } }).then(function(dbExample) {
       res.json(dbExample);
     });
   });
-};
+
+  module.exports = router;

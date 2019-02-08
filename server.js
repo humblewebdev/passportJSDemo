@@ -12,7 +12,8 @@ var PORT = process.env.PORT || 3000;
 
 var passport = require('passport');
 var LocalStrategy = require('passport-local');
-// var JWTStrategy = require('passport-jwt');
+var JWTStrategy = require('passport-jwt').Strategy;
+var ExtractJWT = require('passport-jwt').ExtractJwt;
 
 
 // Middleware
@@ -36,7 +37,6 @@ passport.use(new LocalStrategy(
   function(username, password, cb) {
     models.User.findOne({ username: username }).then(
         function(user) {
-          console.log(user);
           if (!user) { 
             return cb(null, false, {message: 'Incorrect email or password.'});
           } else if (user.validatePassword(password)) {
@@ -45,29 +45,28 @@ passport.use(new LocalStrategy(
             return cb(null, false, {message: 'Incorrect Password!'});
           }
         }
-      ).catch(error => {
+      ).catch(function(error) {
         cb(error)
         throw error;
       });
     }
   ));
 
-  // passport.use(new JWTStrategy({
-  //     jwtFromRequest: ExtractJWT.fromAuthHeaderAsBearerToken(),
-  //     secretOrKey   : 'your_jwt_secret'
-  //     },
-  //     function (jwtPayload, cb) {
+  passport.use(
+      new JWTStrategy({
+        jwtFromRequest: ExtractJWT.fromAuthHeaderAsBearerToken(),
+        secretOrKey   : 'your_jwt_secret'
+      }, function(jwtPayload, done) {
+          //find the user in db if needed
+        try {
+            return done(null, jwtPayload)
+        } catch (error) {
+            console.log(error);
 
-  //     //find the user in db if needed
-  //     return models.User.findById(jwtPayload.id)
-  //         .then(user => {
-  //             return cb(null, user);
-  //         })
-  //         .catch(err => {
-  //             return cb(err);
-  //         });
-  //     }
-  // ));
+            done(error);
+        }
+      }
+  ));
 
 // Handlebars
 app.engine(
@@ -79,19 +78,11 @@ app.engine(
 app.set("view engine", "handlebars");
 
 // Routes
-require("./routes/apiRoutes")(app);
-require("./routes/htmlRoutes")(app);
+var secureRoute = require("./routes/apiRoutes");
+// require("./routes/htmlRoutes");
 require("./routes/authRoutes")(app);
 
-passport.serializeUser(function(user, cb) {
-  cb(null, user.id);
-});
-
-passport.deserializeUser(function(id, cb) {
-  models.User.findById(id, function(err, user) {
-    cb(err, user);
-  });
-});
+app.use('/api', passport.authenticate('jwt', {session: false}), secureRoute);
 
 var syncOptions = { force: false };
 
