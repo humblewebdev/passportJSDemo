@@ -37,13 +37,10 @@ passport.use(new LocalStrategy(
   function(username, password, cb) {
     models.User.findOne({ username: username }).then(
         function(user) {
-          if (!user) { 
-            return cb(null, false, {message: 'Incorrect email or password.'});
-          } else if (user.validatePassword(password)) {
-            return cb(null, user, {message: 'Logged In Successfully'});
-          } else {
-            return cb(null, false, {message: 'Incorrect Password!'});
+          if (!user || !user.validatePassword(password)) {
+              return cb(null, false, {message: 'Incorrect email or password.'});
           }
+            return cb(null, user, {message: 'Logged In Successfully'});
         }
       ).catch(function(error) {
         cb(error)

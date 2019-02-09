@@ -8,10 +8,11 @@ module.exports = function(app) {
             {session: false}, 
             function(error, user, info) {
                 if (error || !user) {
-                    return response.status(400).json({
-                        message: 'Something is not right',
+                    return response.status(403).json({
+                        message: 'Unable to Authorize',
                         user   : user,
-                        error  : error
+                        error  : error,
+                        info: info
                     });
                 }
                request.login(user, {session: false}, function(error) {
