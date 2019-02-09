@@ -35,7 +35,11 @@ passport.use(new LocalStrategy(
     passwordField: 'password'
   },
   function(username, password, cb) {
-    models.User.findOne({ username: username }).then(
+    models.User.findOne({
+        where: {
+            username: username
+        }
+    }).then(
         function(user) {
           if (!user || !user.validatePassword(password)) {
               return cb(null, false, {message: 'Incorrect email or password.'});
