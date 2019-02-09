@@ -1,14 +1,30 @@
 var db = require("../models");
+var jwt = require("jsonwebtoken");
 
 module.exports = function(app) {
   // Load index page
   app.get("/", function(req, res) {
-    db.Example.findAll({}).then(function(dbExamples) {
-      res.render("index", {
-        msg: "Welcome!",
-        examples: dbExamples
-      });
-    });
+      if (req.cookies.token) {
+          var user = jwt.verify(req.cookies.token, 'your_jwt_secret');
+          console.log(user);
+          if (user) {
+              db.Example.findAll({}).then(function (dbExamples) {
+                  return res.render("index", {
+                      msg: "Welcome!",
+                      loggedInUser: user,
+                      examples: dbExamples
+                  });
+              });
+          } else {
+              return res.render("index", {
+                  msg: "Welcome!"
+              });
+          }
+      } else {
+          return res.render("index", {
+              msg: "Welcome!"
+          });
+      }
   });
 
   // Load example page and pass in an example by id

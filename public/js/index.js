@@ -1,11 +1,26 @@
 // Get references to page elements
-var $exampleText = $("#example-text");
-var $exampleDescription = $("#example-description");
+var $username= $("#username");
+var $password = $("#password");
 var $submitBtn = $("#submit");
 var $exampleList = $("#example-list");
 
 // The API object contains methods for each kind of request we'll make
 var API = {
+  authenticateUser: function (username, password) {
+    return $.ajax({
+        headers: {
+          "Content-Type": "application/json"
+        },
+        type: "POST",
+        url: "api/auth",
+        data: JSON.stringify(
+            {
+                username: username,
+                password: password
+            }
+          )
+    })
+  },
   saveExample: function(example) {
     return $.ajax({
       headers: {
@@ -17,9 +32,19 @@ var API = {
     });
   },
   getExamples: function() {
+    var token = document.cookie.split(";")
+        .filter(
+            function(element){
+              return element.indexOf('token=') === 0
+            }
+          )[0].split("=")[1];
     return $.ajax({
       url: "api/examples",
-      type: "GET"
+      type: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer " + token
+      }
     });
   },
   deleteExample: function(id) {
@@ -64,22 +89,16 @@ var refreshExamples = function() {
 var handleFormSubmit = function(event) {
   event.preventDefault();
 
-  var example = {
-    text: $exampleText.val().trim(),
-    description: $exampleDescription.val().trim()
-  };
+  var username = $username.val().trim();
+  var password = $password.val().trim();
 
-  if (!(example.text && example.description)) {
-    alert("You must enter an example text and description!");
-    return;
-  }
-
-  API.saveExample(example).then(function() {
-    refreshExamples();
+  API.authenticateUser(username, password).then(function(token) {
+    document.cookie = "token=" + token.token;
+    location.reload();
   });
 
-  $exampleText.val("");
-  $exampleDescription.val("");
+  $username.val("");
+  $password.val("");
 };
 
 // handleDeleteBtnClick is called when an example's delete button is clicked
